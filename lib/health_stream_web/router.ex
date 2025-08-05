@@ -18,6 +18,7 @@ defmodule HealthStreamWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/monitoring", MonitoringLive, :index
   end
 
   # Other scopes may use custom stacks.
@@ -37,7 +38,12 @@ defmodule HealthStreamWeb.Router do
     scope "/dev" do
       pipe_through :browser
 
-      live_dashboard "/dashboard", metrics: HealthStreamWeb.Telemetry
+      live_dashboard "/dashboard",
+        metrics: HealthStreamWeb.Telemetry,
+        additional_pages: [
+          broadway: {BroadwayDashboard, pipelines: [HealthStream.VitalSignsPipeline]}
+        ]
+
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end

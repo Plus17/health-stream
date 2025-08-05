@@ -63,7 +63,8 @@ defmodule HealthStream.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:broadway_kafka, "~> 0.3"}
+      {:broadway_kafka, "~> 0.3"},
+      {:broadway_dashboard, "~> 0.4.0"}
     ]
   end
 
