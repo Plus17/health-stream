@@ -112,23 +112,25 @@ defmodule HealthStreamWeb.MonitoringLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="min-h-screen bg-gray-100 p-6">
+    <div class="min-h-screen bg-base-200 p-6">
       <div class="max-w-7xl mx-auto">
-        <div class="mb-8 bg-white rounded-lg shadow-sm p-6">
-          <h1 class="text-4xl font-bold text-gray-900 mb-2">🏥 Patient Monitoring Dashboard</h1>
-          <p class="text-lg text-gray-600">Real-time vital signs monitoring and alerts</p>
-          <div class="mt-4 flex space-x-4 text-sm text-gray-600">
-            <div class="flex items-center">
-              <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-              <span>System Online</span>
+        <.header class="mb-8">
+          🏥 Patient Monitoring Dashboard
+          <:subtitle>Real-time vital signs monitoring and alerts</:subtitle>
+          <:actions>
+            <div class="flex space-x-4 text-sm">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-success rounded-full mr-2"></div>
+                <span>System Online</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-info rounded-full mr-2"></div>
+                <span>Live Updates Active</span>
+              </div>
             </div>
-            <div class="flex items-center">
-              <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-              <span>Live Updates Active</span>
-            </div>
-          </div>
-        </div>
-
+          </:actions>
+        </.header>
+        
     <!-- Patient Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div :for={patient <- @patients} class="bg-white rounded-lg shadow-md p-6">
@@ -143,7 +145,11 @@ defmodule HealthStreamWeb.MonitoringLive do
                   </p>
                 <% end %>
               </div>
-              <.button phx-click="toggle_patient_mode" phx-value-patient={patient.id} variant="primary">
+              <.button
+                phx-click="toggle_patient_mode"
+                phx-value-patient={patient.id}
+                variant="primary"
+              >
                 <.icon name="hero-arrow-path" class="size-5" /> Toggle Mode
               </.button>
             </div>
@@ -209,7 +215,7 @@ defmodule HealthStreamWeb.MonitoringLive do
             <% end %>
           </div>
         </div>
-
+        
     <!-- Alerts Section -->
         <div class="bg-white rounded-lg shadow-md p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Alerts</h2>
