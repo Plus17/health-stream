@@ -9,7 +9,7 @@ import Config
 
 config :health_stream,
   ecto_repos: [HealthStream.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime_usec]
 
 # Configures the endpoint
 config :health_stream, HealthStreamWeb.Endpoint,
