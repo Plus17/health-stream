@@ -86,3 +86,12 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+config :brod,
+  clients: [
+    kafka_client: [
+      endpoints: [localhost: 9092],
+      # This will auto-start the producers with default configs
+      auto_start_producers: true
+    ]
+  ]
