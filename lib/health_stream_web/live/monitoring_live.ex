@@ -70,6 +70,7 @@ defmodule HealthStreamWeb.MonitoringLive do
       "P001" ->
         current_mode = DeviceSimulator.get_mode(:patient_p001)
         new_mode = if current_mode == :normal, do: :critical, else: :normal
+        Logger.info("Toggling patient P001 mode to #{new_mode}")
         apply_mode_change(:patient_p001, new_mode)
 
       "P002" ->
@@ -99,8 +100,9 @@ defmodule HealthStreamWeb.MonitoringLive do
     ]
   end
 
-  defp alert_color(:critical), do: "text-red-600 bg-red-50"
-  defp alert_color(:alert), do: "text-orange-600 bg-orange-50"
+  defp get_alert_component_class(:critical), do: "alert alert-error"
+  defp get_alert_component_class(:alert), do: "alert alert-warning"
+  defp get_alert_component_class(_), do: "alert alert-info"
 
   defp vital_status(patient_id, vital_signs) do
     case Map.get(vital_signs, patient_id) do
@@ -114,7 +116,8 @@ defmodule HealthStreamWeb.MonitoringLive do
     ~H"""
     <div class="min-h-screen bg-base-200 p-6">
       <div class="max-w-7xl mx-auto">
-        <.header class="mb-8">
+        <div class="mb-8">
+          <.header>
           🏥 Patient Monitoring Dashboard
           <:subtitle>Real-time vital signs monitoring and alerts</:subtitle>
           <:actions>
@@ -129,8 +132,9 @@ defmodule HealthStreamWeb.MonitoringLive do
               </div>
             </div>
           </:actions>
-        </.header>
-        
+          </.header>
+        </div>
+
     <!-- Patient Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div :for={patient <- @patients} class="card bg-base-100 shadow-lg">
@@ -227,37 +231,44 @@ defmodule HealthStreamWeb.MonitoringLive do
             </div>
           </div>
         </div>
-        
-    <!-- Alerts Section -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Alerts</h2>
 
-          <%= if Enum.empty?(@alerts) do %>
-            <div class="text-center py-8 text-gray-500">
-              <p>No alerts at this time</p>
-            </div>
-          <% else %>
-            <div class="space-y-3">
-              <div :for={{vital_sign, alerts, timestamp} <- @alerts} class="border rounded-lg p-4">
-                <div class="flex justify-between items-start mb-2">
-                  <h4 class="font-semibold text-gray-900">Patient {vital_sign.patient_id}</h4>
-                  <span class="text-sm text-gray-500">
-                    {format_timestamp(timestamp)}
-                  </span>
-                </div>
+        <!-- Alerts Section -->
+        <div class="card bg-base-100 shadow-lg">
+          <div class="card-body">
+            <h2 class="card-title text-xl mb-4">Recent Alerts</h2>
 
-                <div class="space-y-1">
-                  <div
-                    :for={{type, value, severity} <- alerts}
-                    class={"px-3 py-1 rounded-md text-sm inline-block mr-2 #{alert_color(severity)}"}
-                  >
-                    <strong>{format_alert_type(type)}:</strong> {format_alert_value(type, value)}
-                    <span class="ml-1 font-semibold">({String.upcase(to_string(severity))})</span>
+            <%= if Enum.empty?(@alerts) do %>
+              <div class="text-center py-8 opacity-60">
+                <p>No alerts at this time</p>
+              </div>
+            <% else %>
+              <div class="space-y-3">
+                <div :for={{vital_sign, alerts, timestamp} <- @alerts} class="card bg-base-200 border">
+                  <div class="card-body p-4">
+                    <div class="flex justify-between items-start mb-2">
+                      <h4 class="font-semibold">Patient {vital_sign.patient_id}</h4>
+                      <span class="text-sm opacity-70">
+                        {format_timestamp(timestamp)}
+                      </span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                      <div
+                        :for={{type, value, severity} <- alerts}
+                        class={get_alert_component_class(severity)}
+                      >
+                        <.icon name="hero-exclamation-triangle" class="size-4" />
+                        <div>
+                          <strong>{format_alert_type(type)}:</strong> {format_alert_value(type, value)}
+                          <span class="ml-1 font-semibold">({String.upcase(to_string(severity))})</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          <% end %>
+            <% end %>
+          </div>
         </div>
       </div>
     </div>
@@ -280,7 +291,7 @@ defmodule HealthStreamWeb.MonitoringLive do
     DateTime.to_string(timestamp)
   end
 
-  defp safe_get_measurement(vital_sign, field, default \\ "—") do
+  defp safe_get_measurement(vital_sign, field, default) do
     case vital_sign.measurements do
       nil ->
         default
@@ -298,9 +309,9 @@ defmodule HealthStreamWeb.MonitoringLive do
 
   defp get_measurement_card_class(vital_sign, measurement_type) do
     case get_measurement_alert_severity(vital_sign, measurement_type) do
-      :critical -> "bg-red-50 border-red-200 text-red-900"
-      :alert -> "bg-orange-50 border-orange-200 text-orange-900"
-      _ -> "bg-gray-50 border-gray-200 text-gray-900"
+      :critical -> "border-error bg-error/10"
+      :alert -> "border-warning bg-warning/10"
+      _ -> "border-base-300"
     end
   end
 
