@@ -12,8 +12,19 @@ defmodule HealthStream.Application do
       HealthStream.Repo,
       {DNSCluster, query: Application.get_env(:health_stream, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: HealthStream.PubSub},
-      # Start a worker by calling: HealthStream.Worker.start_link(arg)
-      # {HealthStream.Worker, arg},
+      # Broadway pipeline for processing vital signs
+      HealthStream.VitalSignsPipeline,
+      # Device simulators for demo patients
+      Supervisor.child_spec(
+        {HealthStream.DeviceSimulator,
+         patient_id: "P001", device_id: "DEV001", name: :patient_p001},
+        id: :patient_p001
+      ),
+      Supervisor.child_spec(
+        {HealthStream.DeviceSimulator,
+         patient_id: "P002", device_id: "DEV002", name: :patient_p002},
+        id: :patient_p002
+      ),
       # Start to serve requests, typically the last entry
       HealthStreamWeb.Endpoint
     ]
