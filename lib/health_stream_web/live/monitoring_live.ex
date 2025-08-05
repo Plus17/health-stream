@@ -117,7 +117,7 @@ defmodule HealthStreamWeb.MonitoringLive do
         <div class="mb-8 bg-white rounded-lg shadow-sm p-6">
           <h1 class="text-4xl font-bold text-gray-900 mb-2">🏥 Patient Monitoring Dashboard</h1>
           <p class="text-lg text-gray-600">Real-time vital signs monitoring and alerts</p>
-          <div class="mt-4 flex space-x-4 text-sm">
+          <div class="mt-4 flex space-x-4 text-sm text-gray-600">
             <div class="flex items-center">
               <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
               <span>System Online</span>
@@ -143,13 +143,9 @@ defmodule HealthStreamWeb.MonitoringLive do
                   </p>
                 <% end %>
               </div>
-              <button
-                phx-click="toggle_patient_mode"
-                phx-value-patient={patient.id}
-                class="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors"
-              >
+              <.button phx-click="toggle_patient_mode" phx-value-patient={patient.id} variant="primary">
                 <.icon name="hero-arrow-path" class="size-5" /> Toggle Mode
-              </button>
+              </.button>
             </div>
 
             <%= if vital_sign = Map.get(@vital_signs, patient.id) do %>
@@ -228,7 +224,7 @@ defmodule HealthStreamWeb.MonitoringLive do
                 <div class="flex justify-between items-start mb-2">
                   <h4 class="font-semibold text-gray-900">Patient {vital_sign.patient_id}</h4>
                   <span class="text-sm text-gray-500">
-                    {Calendar.strftime(timestamp, "%H:%M:%S:")}
+                    {format_timestamp(timestamp)}
                   </span>
                 </div>
 
