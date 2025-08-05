@@ -287,7 +287,7 @@ defmodule HealthStream.Monitoring.AnomalyDetectorTest do
     end
   end
 
-  defp build_vital_sign(overrides \\ %{}) do
+  defp build_vital_sign(overrides) do
     defaults = %{
       heart_rate: 75,
       blood_pressure_sys: 120,
