@@ -55,6 +55,16 @@ defmodule HealthStream.Monitoring do
     |> Repo.insert()
   end
 
+  def build_vital_sign(attrs) do
+    vital_sign =
+      %VitalSign{}
+      |> VitalSign.changeset(attrs)
+      |> Ecto.Changeset.apply_changes()
+      |> Map.put(:inserted_at, DateTime.utc_now())
+
+    {:ok, vital_sign}
+  end
+
   @doc """
   Deletes a vital_sign.
 

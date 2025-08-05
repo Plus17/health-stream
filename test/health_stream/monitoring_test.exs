@@ -51,6 +51,32 @@ defmodule HealthStream.MonitoringTest do
       assert {:error, %Ecto.Changeset{}} = Monitoring.create_vital_sign(@invalid_attrs)
     end
 
+    test "build_vital_sign/1" do
+      valid_attrs = %{
+        patient_id: "some patient_id",
+        device_id: "some device_id",
+        measurements: %{
+          heart_rate: 80,
+          blood_pressure_sys: 120,
+          blood_pressure_dia: 80,
+          oxygen_saturation: 98,
+          temperature: 82
+        }
+      }
+
+      assert {:ok, %VitalSign{} = vital_sign} = Monitoring.build_vital_sign(valid_attrs)
+      assert vital_sign.patient_id == "some patient_id"
+      assert vital_sign.device_id == "some device_id"
+
+      assert vital_sign.measurements == %Measurements{
+               heart_rate: 80,
+               blood_pressure_sys: 120,
+               blood_pressure_dia: 80,
+               oxygen_saturation: 98,
+               temperature: 82
+             }
+    end
+
     test "delete_vital_sign/1 deletes the vital_sign" do
       vital_sign = vital_sign_fixture()
       assert {:ok, %VitalSign{}} = Monitoring.delete_vital_sign(vital_sign)
