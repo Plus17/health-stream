@@ -133,102 +133,10 @@ defmodule HealthStreamWeb.MonitoringLive do
           </.header>
         </div>
         
-    <!-- Patient Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div :for={patient <- @patients} class="card bg-base-100 shadow-lg">
-            <div class="card-body">
-              <div class="flex justify-between items-start mb-4">
-                <div>
-                  <h2 class="card-title">{patient.name}</h2>
-                  <p class="text-sm opacity-70">ID: {patient.id} | Device: {patient.device}</p>
-                  <p class="text-sm opacity-70">Status: {vital_status(patient.id, @vital_signs)}</p>
-                  <%= if vital_sign = Map.get(@vital_signs, patient.id) do %>
-                    <p class="text-xs opacity-50">
-                      Last update: {format_timestamp(Map.get(vital_sign, :last_update))}
-                    </p>
-                  <% end %>
-                </div>
-                <div class="card-actions">
-                  <.button
-                    phx-click="toggle_patient_mode"
-                    phx-value-patient={patient.id}
-                    variant="primary"
-                  >
-                    <.icon name="hero-arrow-path" class="size-5" /> Toggle Mode
-                  </.button>
-                </div>
-              </div>
-
-              <%= if vital_sign = Map.get(@vital_signs, patient.id) do %>
-                <div class="grid grid-cols-2 gap-4">
-                  <div class={"card bg-base-100 border #{get_measurement_card_class(vital_sign, :heart_rate)}"}>
-                    <div class="card-body p-3">
-                      <div class="text-xs uppercase font-medium opacity-70">Heart Rate</div>
-                      <div class="text-xl font-bold">
-                        {safe_get_measurement(vital_sign, :heart_rate, "—")}
-                        <span class="text-sm font-normal opacity-70">BPM</span>
-                      </div>
-                      <%= if alert_severity = get_measurement_alert_severity(vital_sign, :heart_rate) do %>
-                        <div class="badge badge-error badge-sm font-medium">
-                          {String.upcase(to_string(alert_severity))} ALERT
-                        </div>
-                      <% end %>
-                    </div>
-                  </div>
-                  <div class={"card bg-base-100 border #{get_measurement_card_class(vital_sign, :blood_pressure)}"}>
-                    <div class="card-body p-3">
-                      <div class="text-xs uppercase font-medium opacity-70">Blood Pressure</div>
-                      <div class="text-xl font-bold">
-                        {safe_get_measurement(vital_sign, :blood_pressure_sys, "—")}/{safe_get_measurement(
-                          vital_sign,
-                          :blood_pressure_dia,
-                          "—"
-                        )}
-                        <span class="text-sm font-normal opacity-70">mmHg</span>
-                      </div>
-                      <%= if alert_severity = get_measurement_alert_severity(vital_sign, :blood_pressure) do %>
-                        <div class="badge badge-error badge-sm font-medium">
-                          {String.upcase(to_string(alert_severity))} ALERT
-                        </div>
-                      <% end %>
-                    </div>
-                  </div>
-                  <div class={"card bg-base-100 border #{get_measurement_card_class(vital_sign, :oxygen_saturation)}"}>
-                    <div class="card-body p-3">
-                      <div class="text-xs uppercase font-medium opacity-70">Oxygen Saturation</div>
-                      <div class="text-xl font-bold">
-                        {safe_get_measurement(vital_sign, :oxygen_saturation, "—")}<span class="text-sm font-normal opacity-70">%</span>
-                      </div>
-                      <%= if alert_severity = get_measurement_alert_severity(vital_sign, :oxygen_saturation) do %>
-                        <div class="badge badge-error badge-sm font-medium">
-                          {String.upcase(to_string(alert_severity))} ALERT
-                        </div>
-                      <% end %>
-                    </div>
-                  </div>
-                  <div class={"card bg-base-100 border #{get_measurement_card_class(vital_sign, :temperature)}"}>
-                    <div class="card-body p-3">
-                      <div class="text-xs uppercase font-medium opacity-70">Temperature</div>
-                      <div class="text-xl font-bold">
-                        {safe_get_measurement(vital_sign, :temperature, "—")}<span class="text-sm font-normal opacity-70">°F</span>
-                      </div>
-                      <%= if alert_severity = get_measurement_alert_severity(vital_sign, :temperature) do %>
-                        <div class="badge badge-error badge-sm font-medium">
-                          {String.upcase(to_string(alert_severity))} ALERT
-                        </div>
-                      <% end %>
-                    </div>
-                  </div>
-                </div>
-              <% else %>
-                <div class="text-center py-8 opacity-60">
-                  <div class="text-lg">⏳</div>
-                  <p class="mt-2">Waiting for vital signs data...</p>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        </div>
+        <!-- Patient Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" aria-label="Patient monitoring cards">
+          <.patient_card :for={patient <- @patients} patient={patient} vital_signs={@vital_signs} />
+        </section>
         
     <!-- Alerts Section -->
         <div class="card bg-base-100 shadow-lg">
