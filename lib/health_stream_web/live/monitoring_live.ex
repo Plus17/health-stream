@@ -132,7 +132,7 @@ defmodule HealthStreamWeb.MonitoringLive do
             </:actions>
           </.header>
         </div>
-
+        
     <!-- Patient Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div :for={patient <- @patients} class="card bg-base-100 shadow-lg">
@@ -229,7 +229,7 @@ defmodule HealthStreamWeb.MonitoringLive do
             </div>
           </div>
         </div>
-
+        
     <!-- Alerts Section -->
         <div class="card bg-base-100 shadow-lg">
           <div class="card-body">
