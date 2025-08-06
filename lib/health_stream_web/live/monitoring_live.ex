@@ -4,6 +4,10 @@ defmodule HealthStreamWeb.MonitoringLive do
   alias HealthStream.DeviceSimulator
   require Logger
 
+  import HealthStreamWeb.Components.PatientCard
+  import HealthStreamWeb.Components.AlertNotification
+  import HealthStreamWeb.Components.StatusIndicator
+
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket) do
@@ -114,24 +118,18 @@ defmodule HealthStreamWeb.MonitoringLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="min-h-screen bg-base-200 p-6">
+    <main class="min-h-screen bg-base-200 p-6">
       <div class="max-w-7xl mx-auto">
         <div class="mb-8">
           <.header>
-          🏥 Patient Monitoring Dashboard
-          <:subtitle>Real-time vital signs monitoring and alerts</:subtitle>
-          <:actions>
-            <div class="flex space-x-4 text-sm">
-              <div class="flex items-center">
-                <div class="w-3 h-3 bg-success rounded-full mr-2"></div>
-                <span>System Online</span>
+            🏥 Patient Monitoring Dashboard
+            <:subtitle>Real-time vital signs monitoring and alerts</:subtitle>
+            <:actions>
+              <div class="flex space-x-4 text-sm">
+                <.status_indicator color="success">System Online</.status_indicator>
+                <.status_indicator color="info">Live Updates Active</.status_indicator>
               </div>
-              <div class="flex items-center">
-                <div class="w-3 h-3 bg-info rounded-full mr-2"></div>
-                <span>Live Updates Active</span>
-              </div>
-            </div>
-          </:actions>
+            </:actions>
           </.header>
         </div>
 
@@ -232,7 +230,7 @@ defmodule HealthStreamWeb.MonitoringLive do
           </div>
         </div>
 
-        <!-- Alerts Section -->
+    <!-- Alerts Section -->
         <div class="card bg-base-100 shadow-lg">
           <div class="card-body">
             <h2 class="card-title text-xl mb-4">Recent Alerts</h2>
@@ -260,7 +258,9 @@ defmodule HealthStreamWeb.MonitoringLive do
                         <.icon name="hero-exclamation-triangle" class="size-4" />
                         <div>
                           <strong>{format_alert_type(type)}:</strong> {format_alert_value(type, value)}
-                          <span class="ml-1 font-semibold">({String.upcase(to_string(severity))})</span>
+                          <span class="ml-1 font-semibold">
+                            ({String.upcase(to_string(severity))})
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -271,7 +271,7 @@ defmodule HealthStreamWeb.MonitoringLive do
           </div>
         </div>
       </div>
-    </div>
+    </main>
     """
   end
 
