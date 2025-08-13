@@ -17,6 +17,7 @@ defmodule HealthStreamWeb.Components.PatientCard do
   """
   attr :patient, :map, required: true
   attr :vital_signs, :map, required: true
+  attr :mode, :atom, default: :normal
 
   def patient_card(assigns) do
     ~H"""
@@ -37,7 +38,7 @@ defmodule HealthStreamWeb.Components.PatientCard do
             <.button
               phx-click="toggle_patient_mode"
               phx-value-patient={@patient.id}
-              variant="primary"
+              variant={if @mode == :critical, do: "danger", else: "primary"}
               aria-label={"Toggle monitoring mode for patient #{@patient.name}"}
             >
               <.icon name="hero-arrow-path" class="size-5" /> Toggle Mode
