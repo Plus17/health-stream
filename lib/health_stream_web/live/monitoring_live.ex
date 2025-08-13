@@ -20,6 +20,7 @@ defmodule HealthStreamWeb.MonitoringLive do
       |> assign(:patients, get_patients())
       |> assign(:vital_signs, %{})
       |> assign(:alerts, [])
+      |> assign(:patient_modes, %{"P001" => :normal, "P002" => :normal})
       |> assign(:page_title, "Patient Monitoring Dashboard")
 
     {:ok, socket}
@@ -70,21 +71,24 @@ defmodule HealthStreamWeb.MonitoringLive do
 
   @impl true
   def handle_event("toggle_patient_mode", %{"patient" => patient_id}, socket) do
+    current_mode = Map.get(socket.assigns.patient_modes, patient_id, :normal)
+    new_mode = if current_mode == :normal, do: :critical, else: :normal
+
     case patient_id do
       "P001" ->
-        current_mode = DeviceSimulator.get_mode(:patient_p001)
-        new_mode = if current_mode == :normal, do: :critical, else: :normal
         Logger.info("Toggling patient P001 mode to #{new_mode}")
         apply_mode_change(:patient_p001, new_mode)
 
       "P002" ->
-        current_mode = DeviceSimulator.get_mode(:patient_p002)
-        new_mode = if current_mode == :normal, do: :critical, else: :normal
+        Logger.info("Toggling patient P002 mode to #{new_mode}")
         apply_mode_change(:patient_p002, new_mode)
 
       _ ->
         :ok
     end
+
+    updated_modes = Map.put(socket.assigns.patient_modes, patient_id, new_mode)
+    socket = assign(socket, :patient_modes, updated_modes)
 
     {:noreply, socket}
   end
@@ -127,7 +131,12 @@ defmodule HealthStreamWeb.MonitoringLive do
           class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
           aria-label="Patient monitoring cards"
         >
-          <.patient_card :for={patient <- @patients} patient={patient} vital_signs={@vital_signs} />
+          <.patient_card
+            :for={patient <- @patients}
+            patient={patient}
+            vital_signs={@vital_signs}
+            mode={Map.get(@patient_modes, patient.id, :normal)}
+          />
         </section>
         
     <!-- Alerts Section -->
