@@ -77,7 +77,7 @@ defmodule HealthStream.Monitoring.AnomalyDetectorTest do
         vital_sign = build_vital_sign(%{heart_rate: hr})
         alerts = AnomalyDetector.check_anomalies(vital_sign)
 
-        refute Enum.any?(alerts, fn {type, _, _} -> type == :heart_rate end)
+        refute Enum.any?(alerts, fn {type, _measure, _alert} -> type == :heart_rate end)
       end
     end
   end
