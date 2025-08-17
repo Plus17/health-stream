@@ -30,13 +30,13 @@ defmodule HealthStream.VitalSignsPipeline do
 
     with {:ok, data} <- Jason.decode(raw_data),
          {:ok, vital_sign} <- Monitoring.build_vital_sign(data) do
-      broadcast_vital_sign(vital_sign)
-
       alerts = AnomalyDetector.check_anomalies(vital_sign)
 
       Logger.debug("Anomalies detected: #{inspect(alerts)}")
 
-      unless Enum.empty?(alerts) do
+      if Enum.empty?(alerts) do
+        broadcast_vital_sign(vital_sign)
+      else
         broadcast_alert(vital_sign, alerts)
       end
 
