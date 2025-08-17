@@ -1,8 +1,9 @@
 defmodule HealthStreamWeb.MonitoringLive do
   use HealthStreamWeb, :live_view
 
-  alias HealthStream.DeviceSimulator
   require Logger
+
+  alias HealthStream.DeviceSimulator
 
   import HealthStreamWeb.Components.PatientCard
   import HealthStreamWeb.Components.AlertNotification
