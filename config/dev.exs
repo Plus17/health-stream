@@ -95,3 +95,13 @@ config :brod,
       auto_start_producers: true
     ]
   ]
+
+config :health_stream,
+  producer_module: BroadwayKafka.Producer,
+  producer_options: [
+    hosts: [localhost: 9092],
+    group_id: "vital_signs_consumer",
+    topics: ["vital-signs"],
+    offset_reset_policy: :latest,
+    receive_interval: 1000
+  ]

@@ -11,7 +11,9 @@ defmodule HealthStream.Application do
       HealthStreamWeb.Telemetry,
       HealthStream.Repo,
       {DNSCluster, query: Application.get_env(:health_stream, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: HealthStream.PubSub}
+      {Phoenix.PubSub, name: HealthStream.PubSub},
+      # Broadway pipeline for processing vital signs
+      HealthStream.VitalSignsPipeline
     ]
 
     children =
@@ -20,8 +22,6 @@ defmodule HealthStream.Application do
       else
         children ++
           [
-            # Broadway pipeline for processing vital signs
-            HealthStream.VitalSignsPipeline,
             # Start the device simulator for generating vital signs
             Supervisor.child_spec(
               {HealthStream.DeviceSimulator,

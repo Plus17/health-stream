@@ -12,10 +12,16 @@ defmodule HealthStream.VitalSignsPipeline do
   require Logger
 
   def start_link(_opts) do
+    producer_module =
+      Application.fetch_env!(:health_stream, :producer_module)
+
+    producer_options =
+      Application.get_env(:health_stream, :producer_options, [])
+
     Broadway.start_link(__MODULE__,
       name: __MODULE__,
       producer: [
-        module: {BroadwayKafka.Producer, kafka_config()},
+        module: {producer_module, producer_options},
         concurrency: 1
       ],
       processors: [
@@ -67,15 +73,5 @@ defmodule HealthStream.VitalSignsPipeline do
       "vital_signs:alerts",
       {:vital_sign_alert, vital_sign, alerts}
     )
-  end
-
-  defp kafka_config do
-    [
-      hosts: [localhost: 9092],
-      group_id: "vital_signs_consumer",
-      topics: ["vital-signs"],
-      offset_reset_policy: :latest,
-      receive_interval: 1000
-    ]
   end
 end
