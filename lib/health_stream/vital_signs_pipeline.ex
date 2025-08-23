@@ -25,17 +25,26 @@ defmodule HealthStream.VitalSignsPipeline do
         concurrency: 1
       ],
       processors: [
-        default: [concurrency: 4]
+        default: [concurrency: 2]
       ]
     )
+  end
+
+  @impl Broadway
+  def prepare_messages(messages, context) do
+    Logger.debug("Preparing #{inspect(messages)} messages with context: #{inspect(context)}")
+
+    messages = Enum.map(messages, fn msg -> Message.update_data(msg, &Jason.decode!/1) end)
+
+    Logger.debug("Prepared messages: #{inspect(messages)}")
+    messages
   end
 
   @impl Broadway
   def handle_message(_, %Message{data: raw_data} = message, _) do
     Logger.debug("Processing vital signs message: #{inspect(raw_data)}")
 
-    with {:ok, data} <- Jason.decode(raw_data),
-         {:ok, vital_sign} <- Monitoring.build_vital_sign(data) do
+    with {:ok, vital_sign} <- Monitoring.build_vital_sign(raw_data) do
       alerts = AnomalyDetector.check_anomalies(vital_sign)
 
       Logger.debug("Anomalies detected: #{inspect(alerts)}")
