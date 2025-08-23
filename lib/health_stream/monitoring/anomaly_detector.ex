@@ -7,12 +7,38 @@ defmodule HealthStream.Monitoring.AnomalyDetector do
   alias HealthStream.Monitoring.Measurements
 
   @type measure_type :: :heart_rate | :blood_pressure | :oxygen_saturation | :temperature
-  @type alert :: {measure_type(), any(), :alert | :critical}
+  @type level :: :alert | :critical
+  @type alert :: {measure_type(), any(), level()}
 
   @doc """
   Checks vital signs for anomalies and returns a list of alerts.
+
+  Each alert is a tuple of the form:
+  `{measure_type, value, severity}` where:
+  - `measure_type` is one of `:heart_rate`, `:blood_pressure`, `:oxygen_saturation`, or `:temperature`
+  - `value` is the measured value
+  - `severity` is either `:alert` or `:critical`
+  If no anomalies are detected, returns an empty list.
+
+  ## Examples
+
+      iex> vital_sign = %VitalSign{
+      ...>   measurements: %Measurements{
+      ...>     heart_rate: 150,
+      ...>     blood_pressure_sys: 190,
+      ...>     blood_pressure_dia: 130,
+      ...>     oxygen_saturation: 85,
+      ...>     temperature: 96.0
+      ...>   }
+      ...> }
+      iex> HealthStream.Monitoring.AnomalyDetector.check_anomalies(vital_sign)
+      [
+        {:heart_rate, 150, :critical},
+        {:blood_pressure, "190/130", :critical},
+        {:oxygen_saturation, 85, :critical}
+      ]
   """
-  @spec check_anomalies(VitalSign.t()) :: [alert()]
+  @spec check_anomalies(VitalSign.t()) :: [alert()] | []
   def check_anomalies(%VitalSign{measurements: measurements}) do
     []
     |> check_heart_rate(measurements)
